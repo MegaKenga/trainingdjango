@@ -80,12 +80,6 @@ class Product(BaseFieldsMixin):
 
 class Offer(BaseFieldsMixin):
     name = models.CharField(max_length=128, unique=True, verbose_name='Артикул')
-    brand = models.ForeignKey(
-        Brand,
-        on_delete=models.SET_NULL,
-        null=True,
-        verbose_name='Бренд, к которому относится товар'
-    )
     product = models.ForeignKey(
         Product,
         on_delete=models.SET_NULL,

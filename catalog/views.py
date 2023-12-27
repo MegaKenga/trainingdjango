@@ -5,15 +5,9 @@ from catalog.models import Category, Brand, Product, Offer
 def index(request):
     brands = Brand.objects.all().order_by('name')
     categories = Category.objects.filter(parent=None).filter(brand=None)
-    context = {'brands': brands, 'categories': categories}
-    return render(request, 'catalog/index.html', context=context)
-
-
-def get_brand(request, brand_id):
-    brand = Brand.objects.get(pk=brand_id)
-    categories = Category.objects.filter(brand=brand_id).filter(parent=None)
-    context = {'brand': brand, 'categories': categories}
-    return render(request, 'catalog/brand.html', context=context)
+    brand_categories = Category.objects.filter(parent=None).exclude(brand=None)
+    context = {'brands': brands, 'categories': categories, 'brand_categories': brand_categories}
+    return render(request, 'index.html', context=context)
 
 
 def get_category(request, category_id):
@@ -22,18 +16,21 @@ def get_category(request, category_id):
         brand = Brand.objects.get(id=category.brand_id)
     except Brand.DoesNotExist:
         brand = None
+    # todo: decide which option is better
     parent = category.parent
-    if parent is None:
-        parent = None
+    if parent is not None:
+        parent = Category.objects.get_(pk=parent.id)
     children = Category.objects.filter(parent=category.id)
     products = Product.objects.filter(categories=category.id)
-    context = {'category': category, 'parent': parent, 'brand': brand, 'children': children, 'products': products}
+    context = {'category': category,
+               'parent': parent,
+               'brand': brand, 'children': children, 'products': products}
     return render(request, 'catalog/category.html', context=context)
 
 
-def get_offer(request, brand_id, product_id):
+def get_product_with_offers(request, brand_id, product_id):
     offers = Offer.objects.filter(product=product_id)
     product = Product.objects.get(id=product_id)
     brand = Brand.objects.get(pk=brand_id)
-    context = {'offers': offers, 'product_id': product, 'brand_id': brand}
-    return render(request, 'catalog/offer.html', context=context)
+    context = {'offers': offers, 'product': product, 'brand_id': brand}
+    return render(request, 'catalog/product_with_offers.html', context=context)

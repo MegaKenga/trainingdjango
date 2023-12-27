@@ -11,7 +11,9 @@
     <p>Name: {{ category.name }}</p>
     <p>Description: {{ category.description }}</p>
     {% if parent %}
-      <p>Parent: <a href="{% url 'category' category_id=parent.id%}">{{ parent.name }}</a></p>
+      <p>
+          Parent: <a href="{% url 'category' category_id=parent.id%}">{{ parent.name }}</a>
+      </p>
     {% else %}
       <p>No parent</p>
     {% endif %}

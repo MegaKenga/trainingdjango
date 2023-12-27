@@ -103,6 +103,7 @@ class CategoryAdmin(admin.ModelAdmin):
 class ProductAdmin(admin.ModelAdmin):
     list_display = ('name', 'brand', 'place', 'is_active')
     list_filter = (('brand', RelatedOnlyFieldListFilter), ('categories', RelatedOnlyFieldListFilter), IsActiveStatusFilter)
+    list_editable = ('place', )
     fields = ['name', 'description', 'brand', 'categories', 'place', 'is_active']
     actions_on_bottom = True
     list_per_page = 25
@@ -111,14 +112,24 @@ class ProductAdmin(admin.ModelAdmin):
 
 
 class OfferAdmin(admin.ModelAdmin):
-    list_display = ('name', 'brand', 'product', 'place', 'is_active')
-    list_filter = (('brand', RelatedOnlyFieldListFilter), ('product', RelatedOnlyFieldListFilter), IsActiveStatusFilter)
-    fields = ['name', 'description', 'brand', 'product', 'place', 'is_active']
+    list_display = ('name',
+                    'brand_name',
+                    'product', 'place', 'is_active')
+    list_filter = (
+        ('product__brand', RelatedOnlyFieldListFilter),
+        ('product', RelatedOnlyFieldListFilter),
+        IsActiveStatusFilter)
+    fields = ['name', 'description',
+              # 'brand',
+              'product', 'place', 'is_active']
     actions_on_bottom = True
     list_per_page = 25
     search_fields = ('name', 'group', 'product')
     actions = [make_active, make_inactive]
 
+    def brand_name(self, obj):
+        return obj.product.brand.name
+    brand_name.short_description = 'Brand!!!'
 
 admin.site.register(Brand, BrandAdmin)
 admin.site.register(Category, CategoryAdmin)
